@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MFA package</title>
+  <meta charset="utf-8">
+  <meta name="description" content="MFA package">
+  <meta name="author" content="Ruonan HAO, Mingjia CHEN, Yizhou ZHAO, Zhenqi WANG">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/prettify/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>MFA package</h1>
+    <h2>Stat 243 Final Project, UC Berkeley</h2>
+    <p>Ruonan HAO, Mingjia CHEN, Yizhou ZHAO, Zhenqi WANG<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Multiple Factor Analysis</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Overview</p>
+
+<ul>
+<li><p>Multiple factor analysis (<code>MFA</code>, also called multiple factorial analysis) is an generalization of principal component analysis (<code>PCA</code>). Its goal is to analyze several data sets of variables collected on the same set of observations, or—as in its dual version—several sets of observations measured on the same set of variables.</p></li>
+<li><p>MFA is used when several sets of variables have been measured on the same set of observations. The number and/or nature of the variables used to describe the observations can vary from one set of variables to the other, but the observations should be the same in all the data sets.</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id1" style="background:;">
+  <hgroup>
+    <h2>Main Idea</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><p>The general idea behind MFA is to normalize each of the individual data sets so that their first principal component has the same length. </p></li>
+<li><p>There are several terms with regards to MFA: </p>
+
+<ul>
+<li><code>Compromise/Consensus</code></li>
+<li><code>Factor Scores</code></li>
+<li><code>Partial Factor Scores</code></li>
+<li><code>Contributions</code></li>
+</ul></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id2" style="background:;">
+  <hgroup>
+    <h2>DATA Preprocesing</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><p><code>Centering and Scaling</code>：first normalize each column such that its mean is equal to 0 and the sum of the square values of all its elements is equal to 1. </p></li>
+<li><p><code>Concatenating data tables</code>：The raw data consist of K data sets collected on the same observations. The \(K\) data matrices \(\textbf{X}_{[k]}\) are concatenated into the complete \(I\) by \(J\) data matrix denoted by \(\textbf{X}\).</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id3" style="background:;">
+  <hgroup>
+    <h2>Maths behind the package</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><code>Weight Matrix</code> and <code>Mass Matrix</code></p>
+
+<ul>
+<li><p><code>Mass Matrix</code> has its diagonal elements as mass of each observation:
+\[\begin{equation}
+\textbf{M}=\text{diag}\{\textbf{m}\}
+\end{equation}\]</p></li>
+<li><p><code>Weight Matrix</code> has its diagonal elements as the inverse of the first squared singular value multiplied by a \(J_{[k]}\) vector of ones:
+\[\begin{equation}
+\textbf{a}=[\alpha_1\textbf{1}_{[1]}^T,...,\alpha_k\textbf{1}_{[k]}^T,...,\alpha_K\textbf{1}_{[K]}^T]
+\end{equation}\]</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id4" style="background:;">
+  <hgroup>
+    <h2>Maths behind</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>GSVD</p>
+
+<ul>
+<li>Do <code>Eigendecomposition</code> to get eigenvector and eigenvalue etc.
+\[\begin{equation}
+\textbf{S}_{[+]}=\textbf{X}\textbf{A}\textbf{X}^{\textbf{T}}.
+\end{equation}\]
+\[\begin{equation}
+\textbf{S}_{[+]}=\textbf{U}\boldsymbol{\lambda}\textbf{U}^T=\textbf{P}\sqrt{\textbf{M}}\boldsymbol{\lambda} \sqrt{\textbf{M}}^T\textbf{P}^T=\textbf{P}\boldsymbol{\Lambda}\textbf{P}^T
+\end{equation}\]</li>
+<li>Under the constraints: 
+\[\begin{equation}
+\textbf{S}_{[+]}=\textbf{P}\Lambda \textbf{P}^{\textbf{T}} \quad \text{with} \quad \textbf{P}^{\textbf{T}} \textbf{M}\textbf{P}=\textbf{I}.
+\end{equation}\]</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id5" style="background:;">
+  <hgroup>
+    <h2>Maths behind</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Compute <code>partial factor score</code> \(\textbf{F}_{[k]}\) and <code>common factor score</code> \(\textbf{F}\)
+\[\begin{equation}
+\textbf{F}_{[k]}=K\alpha_k\textbf{X}_{[k]}\textbf{Q}_{[k]}\qquad
+\textbf{F}=\frac{1}{K}\sum_k \textbf{F}_{[k]}
+\end{equation}\]</li>
+<li><code>Contributions</code> of Observations, Variables and Tables
+\[\begin{equation}
+ctr_{i,l}=\frac{m_i × f_{i,l}^2}{\lambda_l} \quad \text{with} \quad \lambda_l=\sum_i m_i × f_{i,l}^2
+\end{equation}\]
+\[\begin{equation}
+ctr_{j,l}=a_j × q_{j,l}^2 \quad \text{with} \quad 1=\sum_j a_j × q_{j,l}^2
+\end{equation}\]
+\[\begin{equation}
+ctr_{k,l}=\sum_j^{J_{[k]}} ctr_{j,l}
+\end{equation}\]</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id6" style="background:;">
+  <hgroup>
+    <h2>Maths behind</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><code>R_V  coefficient</code> between data tables \(k\) and \(k′\) is computed as
+\[\begin{equation}
+\frac{\text{tr}\{(X_{[k]}X_{[k]}^T) \times (X_{[k']}X_{[k']}^T)\}}{\sqrt{\text{tr}\{(X_{[k]}X_{[k]}^T)\times (X_{[k]}X_{[k]}^T)\}\times \text{tr}\{(X_{[k']}X_{[k']}^T)\times (X_{[k']}X_{[k']}^T)\}}}
+\end{equation}\]</li>
+<li><code>L_g  coefficient</code> between data tables \(k\) and \(k′\) is computed as
+\[\begin{equation}
+\begin{aligned}
+\frac{\text{tr}\{(X_{[k]}X_{[k]}^T)× (X_{[k']}X_{[k']}^T)\}}{\gamma_{1,k}^2 × \gamma_{1,k'}^2}
+\end{aligned}
+\end{equation}\]</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id7" style="background:;">
+  <hgroup>
+    <h2>Bootstrap</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>The bootstrap is using to estimate the stability of the compromise factor scores. </li>
+<li>We obtain bootstrap confidence intervals (CIs) by repeatedly sampling with replacement from the set of tables and compute new compromise factor scores. From these estimates we can also compute <code>bootstrap ratios</code> for each dimension by dividing the mean of the bootstrap estimates by their standard deviation.<br></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id8" style="background:;">
+  <hgroup>
+    <h2>MFA</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Getting started</p>
+
+<p>-To run any of the MFA functions, make the package active by using the library command:</p>
+
+<pre><code class="r">library(MFA)
+</code></pre>
+
+<p>We are using a data example included in the package MFA to illustrate the use of the MFA package step by step. This data example concerns 12 wines from three
+wine regions and 10 expert assessors
+were asked to evaluate these wines on 9-point rating
+scales, using four standard variables plus extra variables if any aseessor feels necessary. We call the variables used by one assessor as one group or one table. </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id9" style="background:;">
+  <hgroup>
+    <h2>Prepare the input data</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The data on which we apply MFA functions should be either data frame or matrix object in R. The users could of course read data from a local file and here are of course many ways to enter data into R, just make sure prepare the data to be analyzed as data frame or matrix. The data example &#39;wine&#39; has been loaded in the global environment in R when loading the MFA package. Here we show part of the &#39;wine&#39; data:</p>
+
+<pre><code class="r">wine[1:3,1:6]
+</code></pre>
+
+<pre><code>##     V1.G1 V2.G1 V3.G1 V4.G1 V5.G1 V6.G1
+## NZ1     8     6     7     4     1     6
+## NZ2     7     5     8     1     2     8
+## NZ3     6     5     6     5     3     4
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id10" style="background:;">
+  <hgroup>
+    <h2>Prepare the input data</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>It is required that the data whose variables of each group are stacked together and one group after another,as shown in the data example &#39;wine&#39;, the first 6 columns are in Group 1 and the next 6 columns are in Group2, and so on:</p>
+
+<pre><code class="r">colnames(wine)[1:12]
+</code></pre>
+
+<pre><code>##  [1] &quot;V1.G1&quot; &quot;V2.G1&quot; &quot;V3.G1&quot; &quot;V4.G1&quot; &quot;V5.G1&quot; &quot;V6.G1&quot; &quot;V1.G2&quot; &quot;V2.G2&quot;
+##  [9] &quot;V3.G2&quot; &quot;V4.G2&quot; &quot;V7.G2&quot; &quot;V8.G2&quot;
+</code></pre>
+
+<p>It&#39;s also recommended that the input data has row names and columns names for more readable outputs of the MFA functions. The reasons will be elaborated in the next sections.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id11" style="background:;">
+  <hgroup>
+    <h2>Main function: mfa( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>We can now begin to use <code>mfa()</code> function to build a MFA model on data example &#39;wine&#39;. The usage of <code>mfa()</code> is:</p>
+
+<pre><code class="r">mfa(data,sets,ncomps=NULL,center=TRUE,scale=TRUE)
+</code></pre>
+
+<p><em>Parameters</em>:</p>
+
+<ul>
+<li><code>data</code> is a dataframe or matrix of numerical values</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id12" style="background:;">
+  <hgroup>
+    <h2>Main function: mfa( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><em>Parameters</em>:</p>
+
+<ul>
+<li><code>sets</code> can be specified with: </li>
+<li>  A list of numbers indicating column indicies of each data groups: e.g., for this wine data set if we only want to analyze the first two groups, we specify <code>sets=list(1:6,7:12)</code> means columns 1 to 6 are variables of wine accessor no.1, columns 7 to 12 are variables of wine accessor no.2.</li>
+<li>  A list of variable names indicating column names of each data groups,you can use the first and last variable names of each group: e.g., for this wine data sets, we can use <code>sets=list(c(&quot;V1.G1&quot;,&quot;V6.G1&quot;),c(&quot;V1.G2&quot;,&quot;V8.G2&quot;))</code> for data group 1 and data group 2. Alternatively, you can use the full list of variable names of each group: e.g., <code>sets=list(c(&quot;V1.G1&quot;,&quot;V2.G1&quot;,&quot;V3.G1&quot;,&quot;V4.G1&quot;,&quot;V5.G1&quot;,&quot;V6.G1&quot;),
+c(&quot;V1.G2&quot;,&quot;V2.G2&quot;,&quot;V3.G2&quot;,&quot;V4.G2&quot;,&quot;V7.G2&quot;,&quot;V8.G2&quot;))</code> for data group 1 and data group 2. </li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id13" style="background:;">
+  <hgroup>
+    <h2>Main function: mfa( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><em>Parameters</em>:</p>
+
+<p>-<code>ncomps</code> controls the number of components to be considered by the model. It can be specified with:</p>
+
+<ul>
+<li><p>The default value <code>ncomps=NULL</code>: the <code>mfa()</code> will simply output results of all components. </p></li>
+<li><p>An integer smaller than the rank of the input data: e.g., for this wine data set we can spesify <code>ncomps=3</code>, which limit all the calculations in <code>mfa()</code> to the firs 3 components of the data.</p></li>
+</ul>
+
+<p>-<code>center</code> determines how column centering of the input data is performed. It can be specified with:</p>
+
+<ul>
+<li>  A logical value: the default value <code>center=TRUE</code> meaning centering is done by subtracting the column means (omitting NAs) of x from their corresponding columns. If center is FALSE, no centering is done.</li>
+<li>  A numeric vector of length equal to the number of columns of the input data: centerting is done by each column subtracting the corresponding value from the <code>center</code> vector. </li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id14" style="background:;">
+  <hgroup>
+    <h2>Main function: mfa( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><em>Parameters</em>:</p>
+
+<ul>
+<li><p><code>scale</code> determines how column scaling of the input data is performed AFTER centering. It can be specified with:</p></li>
+<li><p>A logical value: the default value <code>scale=TRUE</code> means scaling is done by dividing the (centered) columns of x by their standard deviations if center is TRUE, and the root mean square otherwise. If scale is FALSE, no scaling is done.</p></li>
+<li><p>A numeric vector of length equal to the number of columns of the input data: scaling is done by each column divided by the corresponding value from scale. </p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id15" style="background:;">
+  <hgroup>
+    <h2>Main function: mfa( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Now we use the <code>mfa()</code> on the &#39;wine&#39; data set, choose to output the first 10 components and center and scale the data, then store the model returned in &#39;mfa_wine&#39;:</p>
+
+<pre><code class="r">varlist&lt;-list(1:6,7:12,13:18,19:23,24:29,30:34,35:38,39:44,45:49,50:53)
+mfa_wine&lt;-mfa(wine,sets=varlist,ncomps=10,center=TRUE,scale=TRUE)
+</code></pre>
+
+<p>Use <code>slotNames(mfa_wine)</code> we can see elements of &#39;mfa_wine&#39; model we just created:</p>
+
+<pre><code class="r">slotNames(mfa_wine)
+</code></pre>
+
+<pre><code>## [1] &quot;sets&quot;                 &quot;weights&quot;              &quot;eigenvalues&quot;         
+## [4] &quot;common_factor_score&quot;  &quot;partial_factor_score&quot; &quot;loadings&quot;
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id16" style="background:;">
+  <hgroup>
+    <h2>Main function: mfa( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Use <code>@</code> operatior to extract elements of the &#39;mfa_wine&#39; model</p>
+
+<pre><code class="r">mfa_wine@eigenvalues
+</code></pre>
+
+<pre><code>##  [1] 0.77025513 0.12292544 0.09071052 0.07601535 0.05960069 0.03920317
+##  [7] 0.03090963 0.02495849 0.01866122 0.01343745
+</code></pre>
+
+<pre><code class="r">mfa_wine@common_factor_score[1:2,1:5]
+</code></pre>
+
+<pre><code>##           Dim1        Dim2        Dim3      Dim4      Dim5
+## NZ1 -0.9802057 -0.16325474  0.02833247 0.1229674 0.1389603
+## NZ2 -0.8088651 -0.03262348 -0.16181752 0.3768692 0.2013803
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id17" style="background:;">
+  <hgroup>
+    <h2>Main function: mfa( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Use <code>@</code> operatior to extract elements of the &#39;mfa_wine&#39; model</p>
+
+<pre><code class="r">mfa_wine@partial_factor_score$`Partial Score: Group 1`[1:5,1:5]
+</code></pre>
+
+<pre><code>##           Dim1       Dim2        Dim3        Dim4        Dim5
+## NZ1 -1.0368259 -0.1554305  0.13930669  0.24679031 -0.16276383
+## NZ2 -1.1792261 -0.5962645 -0.27220450  0.63826129  0.06810246
+## NZ3 -0.2127339  0.1042277  0.05948572 -0.01383920 -0.12781805
+## NZ4 -0.9464768 -0.4462862  0.11346836 -0.02629150 -0.40553050
+## FR1  1.5464473  0.6761448  0.21655108 -0.05814535  0.66423417
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id18" style="background:;">
+  <hgroup>
+    <h2>Main function: mfa( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Use <code>@</code> operatior to extract elements of the &#39;mfa_wine&#39; model</p>
+
+<pre><code class="r">mfa_wine@loadings[1:5,1:5]
+</code></pre>
+
+<pre><code>##             Dim1       Dim2       Dim3       Dim4       Dim5
+## V1.G1 -0.9763854 -1.0556294  0.1409415 -0.6363690 -0.2241311
+## V2.G1 -0.8840598  0.8231040  0.9387799  0.2925292 -1.1786254
+## V3.G1 -0.8622316 -1.3130459 -0.2932791 -0.2806914 -0.6640330
+## V4.G1  0.7996938  0.6090401  1.6797490 -0.3052475  0.5165825
+## V5.G1  0.9496282 -0.5340688  0.3582355 -0.0983741 -0.1452547
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id19" style="background:;">
+  <hgroup>
+    <h2>Print( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Use <code>print()</code> on an object returned by <code>mfa()</code>, e.g. the &#39;mfa_wine&#39; in this tutorial, will display the very basic information of the object.</p>
+
+<pre><code class="r">print(mfa_wine)
+</code></pre>
+
+<pre><code>## There are 10 components. 
+## The eigenvalue of the first component is:  0.7702551 
+## The eigenvalue of the second component is:  0.1229254
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id20" style="background:;">
+  <hgroup>
+    <h2>Plot( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Use <code>plot()</code> on an object returned by <code>mfa()</code>, e.g. the &#39;mfa_wine&#39; in this tutorial, will display graphs with regard to the object and also save the image in high resolution in the working directory named &#39;mfa.jpeg&#39;. The usage of <code>plot()</code> is:</p>
+
+<pre><code class="r">plot(x,dim,singleoutput=NULL)
+</code></pre>
+
+<p><em>Parameters</em>:</p>
+
+<ul>
+<li><p><code>x</code> must be an object return by <code>mfa()</code>.</p></li>
+<li><p><code>dim</code> determines which two dimensions the graphs will be based on. It can be specified with:</p></li>
+<li><p>A vector of integers: e.g., <code>dim=c(1,2)</code> means plot the graphs on dimension 1 and dimension 2.</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id21" style="background:;">
+  <hgroup>
+    <h2>Plot( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><em>Parameters</em>:</p>
+
+<ul>
+<li><p><code>singleoutput</code> determines whether to display all plots in the same graphs or display one specific single graph. It can be specified with:</p></li>
+<li><p>The default value <code>singleoutput=NULL</code>: the <code>plot()</code> will display plots of eigenvalues, compromise factor scores, partial factor scores, and loadings(rescaled to have singular values ad variances) on the same graph. This graph will be saved as &#39;mfa.jpeg&#39; in the working directory.</p></li>
+<li><p>A charater string indicating which graph to be plotted: e.g. <code>singleoutput=&#39;eig&#39;</code> will display a barchar of eigenvalues, <code>singleoutput=&#39;com&#39;</code> will display a scatter plot of compromise factor scores, and <code>singleoutput=&#39;par&#39;</code> will display scatter plots of each group&#39;s partial factor scores and loadings(rescaled to have singular values ad variances). This graph will be saved as &#39;mfa.jpeg&#39; in the working directory.</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id22" style="background:;">
+  <hgroup>
+    <h2>Display all plots</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">plot(mfa_wine,dim=c(1,2),singleoutput=NULL)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-13-1.png" title="plot of chunk unnamed-chunk-13" alt="plot of chunk unnamed-chunk-13" width="650px" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id22" style="background:;">
+  <hgroup>
+    <h2>Display a barchart of eigenvalues</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">plot(mfa_wine,dim=c(1,2),singleoutput=&#39;eig&#39;)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-14-1.png" title="plot of chunk unnamed-chunk-14" alt="plot of chunk unnamed-chunk-14" width="550px" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id23" style="background:;">
+  <hgroup>
+    <h2>Display a scatter plot of compromise factor scores</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">plot(mfa_wine,dim=c(1,2),singleoutput=&#39;com&#39;)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-15-1.png" title="plot of chunk unnamed-chunk-15" alt="plot of chunk unnamed-chunk-15" width="550px" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id24" style="background:;">
+  <hgroup>
+    <h2>Display scatter plots of partial factor scores</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">plot(mfa_wine,dim=c(1,2),singleoutput=&#39;par&#39;)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-16-1.png" title="plot of chunk unnamed-chunk-16" alt="plot of chunk unnamed-chunk-16" width="900px" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id25" style="background:;">
+  <hgroup>
+    <h2>Eigenvalues( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><code>eigenvalues()</code> is a function that takes &#39;mfa&#39; object and returns a table with the singular values(i.e. square root of eigenvalues), the eigenvalues, cumulative, percentage of intertia and cumulative percentage of inertia for all the extracted components. </p>
+
+<pre><code class="r">eigenvalues(mfa_wine)[,1:4]
+</code></pre>
+
+<pre><code>##                               1          2           3           4
+## Singular value        0.8776418  0.3506073  0.30118188  0.27570882
+## Eigenvalue            0.7702551  0.1229254  0.09071052  0.07601535
+## Cumulative            0.7702551  0.8931806  0.98389110  1.05990645
+## % Inertia            61.7846533  9.8602471  7.27618414  6.09743702
+## Cumulative % Inertia 61.7846533 71.6449004 78.92108453 85.01852156
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id26" style="background:;">
+  <hgroup>
+    <h2>Contributions( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><code>contributions()</code> is a function that takes &#39;mfa&#39; object and returns a list of matrix with 1). Contribution of an observation to a dimension. 2). Contribution of a variable to a dimension. 3). Contribution of a table to a dimension. These values help interpreting how observations,variables and tables contribute to the variability of the extracted dimensions. We can use <code>name()</code> to see the elements of the list return by <code>contributions()</code>. </p>
+
+<pre><code class="r">names(contributions(mfa_wine))
+</code></pre>
+
+<pre><code>## [1] &quot;observations&quot; &quot;variables&quot;    &quot;table&quot;
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id27" style="background:;">
+  <hgroup>
+    <h2>Contributions( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The <code>contributions()</code> returns 3 matrices of the names &#39;observations&#39;,&#39;variables&#39; and &#39;table&#39;, each can accessed by the operator <code>$</code>:</p>
+
+<pre><code class="r">contributions(mfa_wine)$observations[1:3,1:5]
+</code></pre>
+
+<pre><code>##           Dim1        Dim2         Dim3       Dim4        Dim5
+## NZ1 0.10394860 0.018067938 7.374457e-04 0.01657668 0.026999064
+## NZ2 0.07078421 0.000721502 2.405538e-02 0.15570361 0.056702380
+## NZ3 0.06265563 0.139844827 2.962285e-05 0.01987071 0.005273309
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id28" style="background:;">
+  <hgroup>
+    <h2>Contributions( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">contributions(mfa_wine)$table[1:2,1:5]
+</code></pre>
+
+<pre><code>##           Dim1       Dim2       Dim3       Dim4       Dim5
+## [1,] 0.1011327 0.09540216 0.09905229 0.06536089 0.07844541
+## [2,] 0.1000578 0.06849423 0.12251404 0.03382958 0.10011471
+</code></pre>
+
+<pre><code class="r">contributions(mfa_wine)$variables[1:2,1:5]
+</code></pre>
+
+<pre><code>##             Dim1       Dim2         Dim3        Dim4       Dim5
+## V1.G1 0.02088509 0.02441275 0.0004351826 0.008871800 0.00110052
+## V2.G1 0.01712210 0.01484237 0.0193072914 0.001874702 0.03043304
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id29" style="background:;">
+  <hgroup>
+    <h2>RV( ) and LG( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><code>RV()</code> takes two groups of data and return the \(R_v\) Coefficient between them. Likewise, <code>LG()</code>takes two groups of data and return the \(L_g\) Coefficient between them. 
+The usage of <code>RV()</code> and <code>LG()</code> is:</p>
+
+<pre><code class="r">RV(table1,table2)
+LG(table1,table2)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id30" style="background:;">
+  <hgroup>
+    <h2>RV( ) and LG( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><code>talble1</code> and <code>table2</code> are two groups of normalized data tables each contains their own variables. e.g. for &#39;wine&#39; data set, the first 6 columns belongs to Group 1 and the next 6 columns belongs to Group2, we first normalized the two tables use R&#39;s <code>scale()</code> function and then use <code>RV()</code> to compute their \(R_v\) Coefficient:</p>
+
+<pre><code class="r">table1&lt;-scale(wine[,1:6])
+table2&lt;-scale(wine[,7:12])
+RV(table1,table2)
+</code></pre>
+
+<pre><code>## [1] 0.8677509
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id31" style="background:;">
+  <hgroup>
+    <h2>RV( ) and LG( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Similarly, <code>LG()</code> takes two normalized data tables and for the first two groups of &#39;wine&#39; data set we use <code>LG()</code> to compute their \(L_g\) Coefficient:</p>
+
+<pre><code class="r">table1&lt;-scale(wine[,1:6])
+table2&lt;-scale(wine[,7:12])
+LG(table1,table2)
+</code></pre>
+
+<pre><code>## [1] 0.9180402
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id32" style="background:;">
+  <hgroup>
+    <h2>RV_table( ) and LG_table()</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><code>RV_table()</code> takes a data set and a list with sets of variables, and return a symmetric matrix of \(R_v\) Coefficients, and a symmetric matrix of \(L_g\) coefficients for <code>LG_table()</code>. 
+The usage of <code>RV_table()</code> and <code>LG_table()</code> is:</p>
+
+<pre><code class="r">RV_table(dataset,sets)
+LG_table(dataset,sets)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id33" style="background:;">
+  <hgroup>
+    <h2>RV_table( ) and LG_table()</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><code>dataset</code> is a normalized data set and <code>sets</code> is a list like the <code>sets</code> in <code>mfa()</code> function indicating the variables of each group. E.g. for the &#39;wine&#39; data set, to compute the \(R_v\) Coefficients between each pair of the first 3 data groups, we can use <code>RV_table()</code>:</p>
+
+<pre><code class="r">nor_wine&lt;-scale(wine[,1:18])
+RV_table(nor_wine,sets=list(1:6,7:12,13:18))
+</code></pre>
+
+<pre><code>##           [,1]      [,2]      [,3]
+## [1,] 1.0000000 0.8677509 0.8603765
+## [2,] 0.8677509 1.0000000 0.7755188
+## [3,] 0.8603765 0.7755188 1.0000000
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id32" style="background:;">
+  <hgroup>
+    <h2>RV_table( ) and LG_table()</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Similarly for <code>LG_table()</code>:</p>
+
+<pre><code class="r">nor_wine&lt;-scale(wine[,1:18])
+LG_table(nor_wine,sets=list(1:6,7:12,13:18))
+</code></pre>
+
+<pre><code>##           [,1]      [,2]      [,3]
+## [1,] 1.0585802 0.9180402 0.9443864
+## [2,] 0.9180402 1.0573275 0.8507391
+## [3,] 0.9443864 0.8507391 1.1381478
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id33" style="background:;">
+  <hgroup>
+    <h2>Bootstrap( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>MFA is a descriptive multivariate technique, but it is often important to be able to complement the descriptive conclusions of an analysis by assessing if its results are reliable and replicable. <code>bootstrap()</code> is a function that takes the output of <code>mfa()</code> and return the boostrap ratio (by dividing each bootstrap mean by its standard deviation) of the compromise factor scores. The useage of <code>bootstrap()</code> is:</p>
+
+<pre><code class="r">bootstrap(object,nbt=1000)
+</code></pre>
+
+<p><em>Parameters</em>:</p>
+
+<ul>
+<li><code>object</code> is an object as an output of <code>mfa()</code> function like &#39;mfa_Wine&#39;</li>
+<li><code>nbt</code> is an integer value stands for the number of bootstrap samples with a default value of 1000.</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id33" style="background:;">
+  <hgroup>
+    <h2>Bootstrap( )</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Use <code>bootstrap()</code> on our &#39;mfa_wine&#39; to get the bootstrap ratios:</p>
+
+<pre><code class="r">bootstrap(mfa_wine,nbt=10000)[1:3,1:5]
+</code></pre>
+
+<pre><code>##           Dim1       Dim2        Dim3      Dim4      Dim5
+## NZ1 -25.094770 -1.2825989  0.36705563 0.8094538 1.5787006
+## NZ2 -10.013120 -0.3085553 -1.41405971 2.4291634 1.7460660
+## NZ3  -8.382479  5.2860679  0.05070739 0.8885004 0.6088556
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id34" style="background:;">
+  <hgroup>
+    <h2>Shiny App</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>We have created a Shiny App for visualization of the output of this package. Please see our Shiny App at <a href="https://zyz2012.shinyapps.io/ShinyApp/">MFA Shiny App</a>. Users are required to give the inputs including <strong>data</strong>,<strong>set</strong>, and the <strong>dimesions</strong> of the outcomes which they want to plot. </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id34" style="background:;">
+  <hgroup>
+    <h2>Shiny App: Input</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><p><code>data</code>: Users should choose data of <strong>.csv</strong> format with the header. If nothing is chosen, the shiny app will plot the outcome of the <em>wine.csv</em> as default.</p></li>
+<li><p><code>sets</code>: Users should choose sets of <strong>.txt</strong> format. The .txt file should have the sets of the format below:
+\[1:6,7:12,13:18,19:23,24:29,30:34,35:38,39:44,45:53\]
+(Use &quot;<strong>,</strong>&quot; to seperate different groups, and &quot;<strong>:</strong>&quot; to separate the starting and ending columns in the data set)
+If <em>sets</em> is not given, the shiny app will plot the outcome of the <em>sets.txt</em> as an example.</p></li>
+<li><p><code>dim</code>: Usually, <strong>dim</strong> equals <strong>c(1,2)</strong> to assign the most important two components.</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id34" style="background:;">
+  <hgroup>
+    <h2>Shiny App: Output</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><code>A table</code> shows the outcome of eigenvalues, partial factor scores, common factor scores and loadings respectively.</li>
+<li><code>Four pictures</code> show the outcome of eigenvalues, partial factor scores, common factor scores and loadings.</li>
+</ul>
+
+<p><strong>Notes</strong>
+1.When plotting the outcome of partial factor scores, it may take some time due to the large size of the picture.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Multiple Factor Analysis'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Main Idea'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='DATA Preprocesing'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Maths behind the package'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Maths behind'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='Maths behind'>
+         6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='Maths behind'>
+         7
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=8 title='Bootstrap'>
+         8
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=9 title='MFA'>
+         9
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=10 title='Prepare the input data'>
+         10
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=11 title='Prepare the input data'>
+         11
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=12 title='Main function: mfa( )'>
+         12
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=13 title='Main function: mfa( )'>
+         13
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=14 title='Main function: mfa( )'>
+         14
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=15 title='Main function: mfa( )'>
+         15
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=16 title='Main function: mfa( )'>
+         16
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=17 title='Main function: mfa( )'>
+         17
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=18 title='Main function: mfa( )'>
+         18
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=19 title='Main function: mfa( )'>
+         19
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=20 title='Print( )'>
+         20
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=21 title='Plot( )'>
+         21
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=22 title='Plot( )'>
+         22
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=23 title='Display all plots'>
+         23
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=24 title='Display a barchart of eigenvalues'>
+         24
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=25 title='Display a scatter plot of compromise factor scores'>
+         25
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=26 title='Display scatter plots of partial factor scores'>
+         26
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=27 title='Eigenvalues( )'>
+         27
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=28 title='Contributions( )'>
+         28
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=29 title='Contributions( )'>
+         29
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=30 title='Contributions( )'>
+         30
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=31 title='RV( ) and LG( )'>
+         31
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=32 title='RV( ) and LG( )'>
+         32
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=33 title='RV( ) and LG( )'>
+         33
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=34 title='RV_table( ) and LG_table()'>
+         34
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=35 title='RV_table( ) and LG_table()'>
+         35
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=36 title='RV_table( ) and LG_table()'>
+         36
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=37 title='Bootstrap( )'>
+         37
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=38 title='Bootstrap( )'>
+         38
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=39 title='Shiny App'>
+         39
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=40 title='Shiny App: Input'>
+         40
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=41 title='Shiny App: Output'>
+         41
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<!-- Google Prettify -->
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.js"></script>
+  <script src='libraries/highlighters/prettify/js/lang-r.js'></script>
+  <script>
+    var pres = document.getElementsByTagName("pre");
+    for (var i=0; i < pres.length; ++i) {
+      pres[i].className = "prettyprint linenums";
+    }
+    prettyPrint();
+  </script>
+  <!-- End Google Prettify --> 
+  </html>

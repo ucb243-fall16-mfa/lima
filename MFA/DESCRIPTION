@@ -1,0 +1,43 @@
+Package: MFA
+Title: Multiple Factor Analysis (MFA)
+Version: 0.0.1.0000
+Authors@R: c(
+    person("Zhenqi", "Wang", email = "zhenqi_wang@berkeley.edu", role = c("aut", "cre")),
+    person("Mingjia", "Chen",role = c("aut")),
+    person("Ruonan", "Hao", role = c("aut")),
+    person("Yizhou", "Zhao", role = c("aut"))
+    )
+Description: Multiple factor analysis (MFA, also called multiple factorial
+    analysis) is an generalization of principal component analysis (PCA). Its
+    goal is to analyze several data sets of variables collected on the same set of
+    observations, or—as in its dual version—several sets of observations measured on
+    the same set of variables.
+Depends:
+    R (>= 3.3.1)
+License: BSD 2.0
+Encoding: UTF-8
+LazyData: true
+Suggests:
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 5.0.1
+Collate:
+    'LG.r'
+    'LG_table.r'
+    'RV.r'
+    'RV_table.r'
+    'mfa.r'
+    'bootstrap.r'
+    'contributions.r'
+    'data.r'
+    'eigenvalues.r'
+    'plot.r'
+    'print.r'
+NeedsCompilation: no
+Packaged: 2016-12-02 23:23:58 UTC; Lee
+Author: Zhenqi Wang [aut, cre],
+    Mingjia Chen [aut],
+    Ruonan Hao [aut],
+    Yizhou Zhao [aut]
+Maintainer: Zhenqi Wang <zhenqi_wang@berkeley.edu>

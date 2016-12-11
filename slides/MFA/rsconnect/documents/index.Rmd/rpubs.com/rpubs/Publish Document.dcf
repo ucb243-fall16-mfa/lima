@@ -1,0 +1,8 @@
+name: Publish Document
+title:
+account: rpubs
+server: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/232262/438a024d6fd94b8ca86e5ba125119588
+bundleId: https://api.rpubs.com/api/v1/document/232262/438a024d6fd94b8ca86e5ba125119588
+url: http://rpubs.com/ZhenqiWangC/232262/edit
+when: 1480644653.71822
